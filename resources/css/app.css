@@ -642,6 +642,20 @@
     background: #ebf0f8;
 }
 
+.icon-btn {
+    padding: 0;
+    min-width: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
 .table-footer-row {
     margin-top: 10px;
     display: flex;
