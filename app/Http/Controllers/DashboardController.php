@@ -17,14 +17,17 @@ class DashboardController extends Controller
 {
     public function index(): View
     {
+        // We only provide a small subset of data for the initial dashboard view.
+        // Other data will be fetched via API when the user navigates to those sections.
         $bootstrapData = [
-            'stock' => Product::query()->orderBy('id')->get()->map(fn (Product $row) => DashboardDataMapper::stock($row))->values(),
-            'orders' => Order::query()->with(['items', 'user'])->orderByDesc('id')->get()->map(fn (Order $row) => DashboardDataMapper::order($row))->values(),
-            'customers' => Customer::query()->orderBy('name')->get()->map(fn (Customer $row) => DashboardDataMapper::customer($row))->values(),
-            'activity' => ActivityLog::query()->orderByDesc('logged_at')->get()->map(fn (ActivityLog $row) => DashboardDataMapper::activity($row))->values(),
-            'users' => User::query()->with('role')->orderBy('name')->get()->map(fn (User $row) => DashboardDataMapper::employee($row))->values(),
-            'calendarEvents' => CalendarEvent::query()->orderBy('event_date')->orderBy('event_time')->get()->map(fn (CalendarEvent $row) => DashboardDataMapper::calendarEvent($row))->values(),
-            'finance' => FinanceTransaction::query()->orderByDesc('transaction_date')->orderByDesc('id')->get()->map(fn (FinanceTransaction $row) => DashboardDataMapper::finance($row))->values(),
+            'stock' => Product::query()->orderBy('id')->limit(10)->get()->map(fn (Product $row) => DashboardDataMapper::stock($row))->values(),
+            'orders' => Order::query()->orderByDesc('id')->limit(10)->get()->map(fn (Order $row) => DashboardDataMapper::order($row))->values(),
+            'users' => User::query()->with('role')->get()->map(fn (User $row) => DashboardDataMapper::employee($row))->values(),
+            // Empty placeholders for other large tables to keep initial load light
+            'customers' => [],
+            'activity' => [],
+            'calendarEvents' => [],
+            'finance' => [],
         ];
 
         $summaryData = [

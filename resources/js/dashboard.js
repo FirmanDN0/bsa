@@ -359,96 +359,35 @@ const tableDefinitions = {
 };
 
 const state = {
-    selectedAccount: { id: 0, name: 'Dapmon', role: 'Karyawan', phone: '' },
+    selectedAccount: { id: 0, name: '', role: '', phone: '' },
     pendingAccount: null,
     isAuthenticated: false,
     currentView: 'dashboard',
     countersAnimated: false,
     dashboardMetricPeriod: 'month',
     data: {
-        stock: [
-            { id: 1, code: 'BRG-001', name: 'LPG', price: 22000, stock: 10 },
-            { id: 2, code: 'BRG-001', name: 'Aqua Galon', price: 23000, stock: 24 },
-            { id: 3, code: 'BRG-001', name: 'Cleo Galon', price: 20000, stock: 10 },
-            { id: 4, code: 'BRG-001', name: 'LPG', price: 22000, stock: 5 },
-            { id: 5, code: 'BRG-001', name: 'LPG', price: 22000, stock: 6 },
-            { id: 6, code: 'BRG-001', name: 'Aqua Galon', price: 23000, stock: 9 },
-            { id: 7, code: 'BRG-001', name: 'LPG', price: 22000, stock: 10 },
-            { id: 8, code: 'BRG-002', name: 'Barbell', price: 450000, stock: 50 },
-            { id: 9, code: 'BRG-003', name: 'Dumbbell', price: 120000, stock: 120 },
-        ],
-        orders: [
-            { id: 1, date: '14.4.25', author: 'Remon', recorder: 'Dapmon', product: 'LPG', nominal: 220000, status: 'terkirim' },
-            { id: 2, date: '14.4.25', author: 'Lesa', recorder: 'Firman', product: 'Aqua Galon', nominal: 69000, status: 'terkirim' },
-            { id: 3, date: '14.4.25', author: 'Lesa', recorder: 'Rafi', product: 'Cleo Galon', nominal: 40000, status: 'tertolak' },
-            { id: 4, date: '14.4.25', author: 'Firman', recorder: 'Dapmon', product: 'LPG', nominal: 440000, status: 'tertunda' },
-            { id: 5, date: '14.4.25', author: 'Rafi', recorder: 'Firman', product: 'LPG', nominal: 220000, status: 'tertolak' },
-            { id: 6, date: '14.4.25', author: 'Rafi', recorder: 'Rafi', product: 'Aqua Galon', nominal: 69000, status: 'tertunda' },
-            { id: 7, date: '14.4.25', author: 'Remon', recorder: 'Dapmon', product: 'LPG', nominal: 220000, status: 'tertunda' },
-        ],
-        customers: [
-            { id: 1, name: 'Firman', phone: '085231287676', address: 'Jl. Anggrek No. 10', history: 1, total: 1000000 },
-            { id: 2, name: 'Firman', phone: '085231287676', address: 'Jl. Melati No. 2', history: 1, total: 30000 },
-            { id: 3, name: 'Firman', phone: '085231287676', address: 'Jl. Teratai No. 7', history: 3, total: 50000 },
-            { id: 4, name: 'Firman', phone: '085128712432', address: 'Perum Griya Asri Blok B3', history: 4, total: 1000000 },
-            { id: 5, name: 'Daus', phone: '085231287876', address: 'Jl. Raya Cileungsi No. 88', history: 2, total: 1000000 },
-            { id: 6, name: 'Daus', phone: '085231287231', address: 'Komplek Taman Sari No. 15', history: 1, total: 30000 },
-            { id: 7, name: 'Daus', phone: '085231287741', address: 'Jl. Kamboja Gang 4', history: 1, total: 1000000 },
-        ],
-        activity: [
-            { id: 1, dateTime: '14.04.26 08:15', user: 'Firman', action: 'Login', module: 'Dashboard', status: 'sukses' },
-            { id: 2, dateTime: '14.04.26 08:21', user: 'Dapmon', action: 'Tambah Data', module: 'Stok', status: 'sukses' },
-            { id: 3, dateTime: '14.04.26 09:02', user: 'Remon', action: 'Edit Data', module: 'Pesanan', status: 'warning' },
-            { id: 4, dateTime: '14.04.26 09:43', user: 'Lesa', action: 'Export Laporan', module: 'Keuangan', status: 'sukses' },
-            { id: 5, dateTime: '14.04.26 10:04', user: 'Rafi', action: 'Hapus Data', module: 'Pelanggan', status: 'gagal' },
-            { id: 6, dateTime: '14.04.26 10:18', user: 'Firman', action: 'Tambah Data', module: 'Karyawan', status: 'sukses' },
-            { id: 7, dateTime: '14.04.26 11:01', user: 'Dapmon', action: 'Edit Data', module: 'Keuangan', status: 'sukses' },
-            { id: 8, dateTime: '14.04.26 11:40', user: 'Remon', action: 'Login', module: 'Dashboard', status: 'sukses' },
-        ],
-        users: [
-            { id: 1, name: 'Firman', role: 'karyawan', position: 'Supervisor', division: 'Operasional', phone: '085231287676', shift: 'Pagi', status: 'aktif' },
-            { id: 2, name: 'Dapmon', role: 'owner', position: 'Admin', division: 'Keuangan', phone: '085231287101', shift: 'Pagi', status: 'aktif' },
-            { id: 3, name: 'Remon', role: 'karyawan', position: 'Staf Gudang', division: 'Logistik', phone: '085231287202', shift: 'Siang', status: 'aktif' },
-            { id: 4, name: 'Lesa', role: 'karyawan', position: 'Kasir', division: 'Penjualan', phone: '085231287303', shift: 'Siang', status: 'cuti' },
-            { id: 5, name: 'Rafi', role: 'karyawan', position: 'Driver', division: 'Distribusi', phone: '085231287404', shift: 'Malam', status: 'aktif' },
-            { id: 6, name: 'Daus', role: 'karyawan', position: 'Driver', division: 'Distribusi', phone: '085231287505', shift: 'Pagi', status: 'nonaktif' },
-            { id: 7, name: 'Anita', role: 'karyawan', position: 'HR', division: 'SDM', phone: '085231287606', shift: 'Pagi', status: 'aktif' },
-        ],
-        calendarEvents: [
-            { id: 1, date: '2026-04-14', time: '08:30', title: 'Rapat evaluasi operasional mingguan', type: 'Meeting', location: 'Ruang Meeting A', status: 'terjadwal' },
-            { id: 2, date: '2026-04-14', time: '13:00', title: 'Pengiriman LPG area Barat', type: 'Pengiriman', location: 'Gudang Utama', status: 'berlangsung' },
-            { id: 3, date: '2026-04-15', time: '09:00', title: 'Audit stok tabung kosong', type: 'Operasional', location: 'Zona Gudang B', status: 'terjadwal' },
-            { id: 4, date: '2026-04-16', time: '15:00', title: 'Review arus kas pertengahan bulan', type: 'Keuangan', location: 'Ruang Finance', status: 'terjadwal' },
-            { id: 5, date: '2026-04-18', time: '10:00', title: 'Maintenance kendaraan distribusi', type: 'Maintenance', location: 'Workshop', status: 'terjadwal' },
-            { id: 6, date: '2026-04-22', time: '11:00', title: 'Sosialisasi SOP layanan pelanggan', type: 'Meeting', location: 'Ruang Training', status: 'terjadwal' },
-            { id: 7, date: '2026-04-27', time: '08:00', title: 'Pengiriman bulk pelanggan industri', type: 'Pengiriman', location: 'Dock 3', status: 'terjadwal' },
-        ],
-        finance: [
-            { id: 1, date: '14.04.26', description: 'Pembayaran Pesanan LPG #INV-2204', category: 'pemasukan', amount: 440000 },
-            { id: 2, date: '14.04.26', description: 'Logistik - Pembelian stok Aqua Galon', category: 'pengeluaran', amount: 300000 },
-            { id: 3, date: '13.04.26', description: 'Operasional - Tagihan listrik gudang', category: 'pengeluaran', amount: 680000 },
-            { id: 4, date: '13.04.26', description: 'Pembayaran pelanggan galon', category: 'pemasukan', amount: 138000 },
-            { id: 5, date: '12.04.26', description: 'Gaji - Pembayaran gaji karyawan mingguan', category: 'pengeluaran', amount: 2100000 },
-            { id: 6, date: '11.04.26', description: 'Pelunasan invoice distributor', category: 'pemasukan', amount: 2780000 },
-            { id: 7, date: '10.04.26', description: 'Operasional - Service kendaraan distribusi', category: 'pengeluaran', amount: 960000 },
-            { id: 8, date: '09.04.26', description: 'Logistik - Pembelian segel dan perlengkapan', category: 'pengeluaran', amount: 540000 },
-            { id: 9, date: '06.04.26', description: 'Pembayaran kontrak pelanggan bulanan', category: 'pemasukan', amount: 5210000 },
-            { id: 10, date: '03.04.26', description: 'Gaji - Insentif tim pengantaran', category: 'pengeluaran', amount: 1450000 },
-        ],
+        stock: [],
+        orders: [],
+        customers: [],
+        activity: [],
+        users: [],
+        calendarEvents: [],
+        finance: [],
     },
     tableState: {
-        stock: { query: '', page: 1, perPage: 7, sortKey: 'id', sortDir: 'asc', filterIndex: 0 },
-        orders: { query: '', page: 1, perPage: 7, sortKey: 'id', sortDir: 'asc', filterIndex: 0 },
-        customers: { query: '', page: 1, perPage: 7, sortKey: 'name', sortDir: 'asc', filterIndex: 0 },
-        activity: { query: '', page: 1, perPage: 7, sortKey: 'dateTime', sortDir: 'desc', filterIndex: 0 },
-        users: { query: '', page: 1, perPage: 7, sortKey: 'id', sortDir: 'asc', filterIndex: 0 },
-        finance: { query: '', page: 1, perPage: 7, sortKey: 'id', sortDir: 'desc', filterIndex: 0 },
+        stock: { query: '', page: 1, perPage: 7, sortKey: 'id', sortDir: 'asc', filterIndex: 0, loaded: false },
+        orders: { query: '', page: 1, perPage: 7, sortKey: 'id', sortDir: 'asc', filterIndex: 0, loaded: false },
+        customers: { query: '', page: 1, perPage: 7, sortKey: 'name', sortDir: 'asc', filterIndex: 0, loaded: false },
+        activity: { query: '', page: 1, perPage: 7, sortKey: 'dateTime', sortDir: 'desc', filterIndex: 0, loaded: false },
+        users: { query: '', page: 1, perPage: 7, sortKey: 'id', sortDir: 'asc', filterIndex: 0, loaded: false },
+        finance: { query: '', page: 1, perPage: 7, sortKey: 'id', sortDir: 'desc', filterIndex: 0, loaded: false },
     },
     calendarView: {
         year: initialWibDate.year,
         month: initialWibDate.month - 1,
         selectedDate: initialWibIsoDate,
         search: '',
+        loaded: false,
     },
     financePeriod: 'month',
     modalState: {
@@ -475,6 +414,7 @@ const state = {
         deletingKeys: new Set(),
         importingTables: new Set(),
         exportingTables: new Set(),
+        loadingTables: new Set(),
     },
     leaveGuard: {
         allowUnload: false,
@@ -482,8 +422,14 @@ const state = {
     },
 };
 
-syncMockDateLabelsToWib(state.data);
+// syncMockDateLabelsToWib(state.data);
 state.data = mergeBootstrapData(state.data, bootstrapData);
+// Mark bootstrap data as loaded
+Object.keys(bootstrapData).forEach(table => {
+    if (state.tableState[table] && bootstrapData[table].length > 0) {
+        state.tableState[table].loaded = true;
+    }
+});
 restoreTableStateSession();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1458,7 +1404,7 @@ async function sendLogoutActivity() {
     }
 }
 
-function openView(viewName) {
+async function openView(viewName) {
     if (isOwnerOnlyView(viewName) && !hasOwnerAccess()) {
         showToast(OWNER_ONLY_MESSAGE);
         return;
@@ -1491,6 +1437,11 @@ function openView(viewName) {
         document.getElementById('bsaApp')?.classList.remove('sidebar-mobile-open');
     }
 
+    // Lazy load data if not already loaded
+    if (state.tableState[viewName] && !state.tableState[viewName].loaded) {
+        await fetchTableData(viewName);
+    }
+
     if (viewName === 'dashboard') {
         renderDashboardMiniCalendar();
         updateMetricCounters(!state.countersAnimated);
@@ -1502,6 +1453,45 @@ function openView(viewName) {
 
     if (viewName === 'calendar') {
         renderCalendarView();
+    }
+}
+
+async function fetchTableData(table) {
+    const endpoint = apiEndpoints[table];
+    if (!endpoint || state.requestLocks.loadingTables.has(table)) {
+        return;
+    }
+
+    state.requestLocks.loadingTables.add(table);
+    renderTableLoading(table, true);
+
+    try {
+        const response = await fetch(endpoint, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                ...buildActorRequestHeaders(),
+            }
+        });
+        const result = await parseJsonResponse(response);
+        if (result && result.data) {
+            state.data[table] = Array.isArray(result.data) ? result.data : [];
+            state.tableState[table].loaded = true;
+        }
+    } catch (e) {
+        console.error(`Fetch error for ${table}:`, e);
+        showToast(`Gagal memuat data ${table}. Silakan coba lagi.`);
+    } finally {
+        state.requestLocks.loadingTables.delete(table);
+        renderTableLoading(table, false);
+        renderTable(table);
+    }
+}
+
+function renderTableLoading(table, isLoading) {
+    const panel = document.querySelector(`[data-table-panel="${table}"]`);
+    if (panel) {
+        panel.classList.toggle('is-loading', Boolean(isLoading));
     }
 }
 

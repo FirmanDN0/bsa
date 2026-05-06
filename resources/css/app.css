@@ -636,7 +636,7 @@
 
 .toolbar-actions {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
@@ -663,17 +663,28 @@
 }
 
 .icon-btn {
-    padding: 0;
+    padding: 0 12px;
+    height: 38px;
     min-width: 38px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.icon-btn span {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #4b5563;
 }
 
 .icon-btn svg {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     display: block;
+    flex-shrink: 0;
 }
 
 .table-footer-row {
@@ -1088,7 +1099,7 @@
 
 .finance-toolbar-actions {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
@@ -1098,7 +1109,7 @@
 
 .finance-toolbar-actions .ghost-btn.icon-btn {
     min-width: 38px;
-    width: 38px;
+    width: auto;
 }
 
 .finance-toolbar-actions .filter-select {
