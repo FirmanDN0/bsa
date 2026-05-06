@@ -9,6 +9,11 @@ const accountLogoutEndpoint = apiEndpoints.accountLogout || apiConfig.accountLog
 const OWNER_ONLY_VIEWS = new Set(['activity', 'users']);
 const OWNER_ONLY_MESSAGE = 'Menu ini hanya dapat diakses oleh Owner.';
 const WIB_TIMEZONE = 'Asia/Jakarta';
+const DASHBOARD_METRIC_PERIOD_LABELS = {
+    day: 'Hari ini',
+    week: 'Minggu ini',
+    month: 'Bulan ini',
+};
 const ACCOUNT_SESSION_KEY = 'bsa.activeAccount';
 const VIEW_SESSION_KEY = 'bsa.activeView';
 const TABLE_STATE_SESSION_KEY = 'bsa.tableState';
@@ -359,6 +364,7 @@ const state = {
     isAuthenticated: false,
     currentView: 'dashboard',
     countersAnimated: false,
+    dashboardMetricPeriod: 'month',
     data: {
         stock: [
             { id: 1, code: 'BRG-001', name: 'LPG', price: 22000, stock: 10 },
@@ -490,6 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bindSidebarControls();
     bindStaticActionLinks();
     bindViewShortcutButtons();
+    bindDashboardMetricControls();
     bindTableControls();
     bindFinanceControls();
     bindCalendarControls();
@@ -527,7 +534,8 @@ function bindSidebarControls() {
 
     const sidebarToggle = document.getElementById('sidebarToggle');
     if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', () => {
+        sidebarToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
             const app = document.getElementById('bsaApp');
             if (!app) {
                 return;
@@ -567,6 +575,31 @@ function bindViewShortcutButtons() {
                 openView(target);
             }
         });
+    });
+}
+
+function bindDashboardMetricControls() {
+    document.querySelectorAll('[data-metric-period-select]').forEach((control) => {
+        if (!(control instanceof HTMLSelectElement)) {
+            return;
+        }
+
+        control.value = state.dashboardMetricPeriod;
+
+        control.addEventListener('change', () => {
+            const next = normalizeMetricPeriod(control.value);
+            state.dashboardMetricPeriod = next;
+            syncDashboardMetricPeriodControls();
+            updateMetricCounters(true);
+        });
+    });
+}
+
+function syncDashboardMetricPeriodControls() {
+    document.querySelectorAll('[data-metric-period-select]').forEach((control) => {
+        if (control instanceof HTMLSelectElement) {
+            control.value = state.dashboardMetricPeriod;
+        }
     });
 }
 
@@ -1043,9 +1076,7 @@ function bindAccountGate() {
     const passwordModal = document.getElementById('passwordModal');
     const passwordForm = document.getElementById('passwordForm');
 
-    if (accountGate) {
-        accountGate.classList.toggle('is-visible', !state.isAuthenticated);
-    }
+    syncAccountGateVisibility(!state.isAuthenticated, accountGate);
 
     document.querySelectorAll('.account-option').forEach((button) => {
         button.addEventListener('click', () => {
@@ -1184,7 +1215,7 @@ async function submitAccountGateLogin() {
         applyRoleAccessControl();
 
         closePasswordModal();
-        document.getElementById('accountGate')?.classList.remove('is-visible');
+        syncAccountGateVisibility(false);
         showToast(`Selamat datang ${state.selectedAccount.name}.`);
     } catch (requestError) {
         if (error) {
@@ -1391,8 +1422,17 @@ async function handleLogoutRequest() {
     clearAccountSession();
     clearViewSession();
     clearTableStateSession();
-    document.getElementById('accountGate')?.classList.add('is-visible');
+    syncAccountGateVisibility(true);
     showToast('Sesi berakhir. Pilih akun untuk masuk kembali.');
+}
+
+function syncAccountGateVisibility(isVisible, accountGate = null) {
+    const gate = accountGate || document.getElementById('accountGate');
+    if (gate) {
+        gate.classList.toggle('is-visible', Boolean(isVisible));
+    }
+
+    document.body.classList.toggle('is-account-gate-open', Boolean(isVisible));
 }
 
 async function sendLogoutActivity() {
@@ -1787,7 +1827,7 @@ function renderDashboardMiniCalendar() {
 }
 
 function updateMetricCounters(animate = false) {
-    const metrics = buildDashboardMetrics();
+    const metrics = buildDashboardMetrics(state.dashboardMetricPeriod);
     const values = {
         customerGrowth: metrics.customerGrowth.value,
         salesTotal: metrics.salesTotal.value,
@@ -1822,9 +1862,10 @@ function updateMetricCounters(animate = false) {
     }
 }
 
-function buildDashboardMetrics() {
+function buildDashboardMetrics(period = 'month') {
     const anchor = getWibTodayDate();
-    const { buckets, indexByKey } = buildMetricMonthBuckets(anchor, 6);
+    const normalizedPeriod = normalizeMetricPeriod(period);
+    const { buckets, indexByKey } = buildDashboardMetricBuckets(anchor, normalizedPeriod);
 
     const orders = (state.data.orders || [])
         .map((row) => {
@@ -1852,15 +1893,15 @@ function buildDashboardMetrics() {
                 return;
             }
 
-            const monthKey = getMetricMonthKey(row.parsedDate);
+            const bucketKey = getDashboardMetricBucketKey(row.parsedDate, normalizedPeriod);
             if (!firstMonthByCustomer[customerKey]) {
-                firstMonthByCustomer[customerKey] = monthKey;
+                firstMonthByCustomer[customerKey] = bucketKey;
             }
         });
 
     orders.forEach((row) => {
-        const monthKey = getMetricMonthKey(row.parsedDate);
-        const index = indexByKey[monthKey];
+        const bucketKey = getDashboardMetricBucketKey(row.parsedDate, normalizedPeriod);
+        const index = indexByKey[bucketKey];
         if (index === undefined) {
             return;
         }
@@ -1940,10 +1981,12 @@ function buildDashboardMetrics() {
 
     const leadingPct = Math.max(...donutEntries.map((entry) => Number(entry.pct || 0)), 0);
 
+    const periodLabel = DASHBOARD_METRIC_PERIOD_LABELS[normalizedPeriod] || DASHBOARD_METRIC_PERIOD_LABELS.month;
+
     return {
         customerGrowth: {
             value: round2(customerGrowth),
-            subtitle: `${current.activeCustomers.size} pelanggan aktif · ${current.newCustomers} baru bulan ini`,
+            subtitle: `${current.activeCustomers.size} pelanggan aktif · ${current.newCustomers} baru ${periodLabel.toLowerCase()}`,
             chart: {
                 series: [
                     buckets.map((bucket) => bucket.activeCustomers.size),
@@ -1955,7 +1998,7 @@ function buildDashboardMetrics() {
         },
         salesTotal: {
             value: Math.round(current.salesDelivered),
-            subtitle: `${current.deliveredOrders} order terkirim bulan ini`,
+            subtitle: `${current.deliveredOrders} order terkirim ${periodLabel.toLowerCase()}`,
             chart: {
                 series: [
                     buckets.map((bucket) => Math.round(bucket.salesDelivered)),
@@ -1967,7 +2010,7 @@ function buildDashboardMetrics() {
         },
         productSold: {
             value: Math.round(current.totalUnits),
-            subtitle: `${current.deliveredOrders} order terkirim bulan ini`,
+            subtitle: `${current.deliveredOrders} order terkirim ${periodLabel.toLowerCase()}`,
             donut: {
                 entries: donutEntries,
                 centerLabel: `${leadingPct}%`,
@@ -1976,32 +2019,79 @@ function buildDashboardMetrics() {
     };
 }
 
-function buildMetricMonthBuckets(anchorDate, count = 6) {
+function buildDashboardMetricBuckets(anchorDate, period) {
     const buckets = [];
     const indexByKey = {};
 
-    for (let i = count - 1; i >= 0; i -= 1) {
+    if (period === 'day') {
+        for (let i = 6; i >= 0; i -= 1) {
+            const date = shiftDate(anchorDate, -i);
+            const key = formatIsoDate(date);
+            indexByKey[key] = buckets.length;
+            buckets.push(createDashboardMetricBucket(key, formatShortDate(date)));
+        }
+        return { buckets, indexByKey };
+    }
+
+    if (period === 'week') {
+        const anchorWeekStart = getFinanceWeekStart(anchorDate);
+        for (let i = 5; i >= 0; i -= 1) {
+            const weekStart = shiftDate(anchorWeekStart, -(i * 7));
+            const key = formatIsoDate(weekStart);
+            indexByKey[key] = buckets.length;
+            buckets.push(createDashboardMetricBucket(key, `${String(weekStart.getDate()).padStart(2, '0')}/${String(weekStart.getMonth() + 1).padStart(2, '0')}`));
+        }
+        return { buckets, indexByKey };
+    }
+
+    for (let i = 5; i >= 0; i -= 1) {
         const monthDate = new Date(anchorDate.getFullYear(), anchorDate.getMonth() - i, 1);
         const key = getMetricMonthKey(monthDate);
 
         indexByKey[key] = buckets.length;
-        buckets.push({
-            key,
-            label: getMetricMonthLabel(monthDate),
-            activeCustomers: new Set(),
-            newCustomers: 0,
-            returningCustomers: 0,
-            salesDelivered: 0,
-            salesPending: 0,
-            salesRejected: 0,
-            deliveredOrders: 0,
-            pendingOrders: 0,
-            totalUnits: 0,
-            productUnits: {},
-        });
+        buckets.push(createDashboardMetricBucket(key, getMetricMonthLabel(monthDate)));
     }
 
     return { buckets, indexByKey };
+}
+
+function createDashboardMetricBucket(key, label) {
+    return {
+        key,
+        label,
+        activeCustomers: new Set(),
+        newCustomers: 0,
+        returningCustomers: 0,
+        salesDelivered: 0,
+        salesPending: 0,
+        salesRejected: 0,
+        deliveredOrders: 0,
+        pendingOrders: 0,
+        totalUnits: 0,
+        productUnits: {},
+    };
+}
+
+function getDashboardMetricBucketKey(dateObj, period) {
+    const normalizedPeriod = normalizeMetricPeriod(period);
+    if (normalizedPeriod === 'day') {
+        return formatIsoDate(dateObj);
+    }
+
+    if (normalizedPeriod === 'week') {
+        return formatIsoDate(getFinanceWeekStart(dateObj));
+    }
+
+    return getMetricMonthKey(dateObj);
+}
+
+function normalizeMetricPeriod(value) {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized === 'day' || normalized === 'week' || normalized === 'month') {
+        return normalized;
+    }
+
+    return 'month';
 }
 
 function getMetricMonthKey(dateObj) {
@@ -2588,10 +2678,10 @@ function formatFinanceCategoryLabel(value) {
     return normalizeFinanceCategory(value) === 'pengeluaran' ? 'Pengeluaran' : 'Pemasukan';
 }
 
-function extractFinanceDetailLabel(description) {
+function extractFinanceDetailLabel(description, category = '') {
     const text = String(description || '').trim();
     if (!text) {
-        return 'Lainnya';
+        return formatFinanceCategoryLabel(category);
     }
 
     const match = text.match(/^([^:-]{2,30})\s[-:]\s/);
@@ -2599,7 +2689,7 @@ function extractFinanceDetailLabel(description) {
         return capitalize(match[1].trim());
     }
 
-    return 'Lainnya';
+    return formatFinanceCategoryLabel(category);
 }
 
 function renderFinanceDistribution(rows) {
@@ -2611,30 +2701,24 @@ function renderFinanceDistribution(rows) {
         return;
     }
 
-    const grouped = {};
+    const grouped = {
+        Pemasukan: 0,
+        Pengeluaran: 0,
+    };
+
     rows.forEach((row) => {
-        if (!isFinanceOutgoingCategory(row.category)) {
-            return;
-        }
-        const detailLabel = extractFinanceDetailLabel(row.description);
-        grouped[detailLabel] = (grouped[detailLabel] || 0) + Number(row.amount);
+        const label = formatFinanceCategoryLabel(row.category);
+        grouped[label] = (grouped[label] || 0) + Number(row.amount);
     });
 
-    let entries = Object.entries(grouped)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3);
-
-    if (!entries.length) {
-        entries = [
-            ['Operasional', 0],
-            ['Logistik', 0],
-            ['Gaji', 0],
-        ];
-    }
+    const entries = [
+        ['Pemasukan', grouped.Pemasukan || 0],
+        ['Pengeluaran', grouped.Pengeluaran || 0],
+    ];
 
     const total = entries.reduce((sum, [, value]) => sum + Number(value), 0);
-    const colors = ['#6b7bff', '#e08cff', '#fb7ba1'];
-    const dots = ['dot-a', 'dot-b', 'dot-c'];
+    const colors = ['#6b7bff', '#fb7ba1'];
+    const dots = ['dot-a', 'dot-c'];
 
     totalLabel.textContent = `Rp ${formatCurrency(total)}`;
 
@@ -3035,10 +3119,12 @@ function bindOrderItemsBuilder(table, editingRow) {
             <span class="input-label">Daftar Barang</span>
             <datalist id="${datalistId}">${options}</datalist>
             <div class="order-items-list" id="orderItemsRows"></div>
-            <div class="order-items-total" id="orderItemsTotal">
-                <span>Total Harga</span>
-                <strong id="orderItemsTotalValue">Rp 0</strong>
-            </div>
+            <details class="order-items-total" id="orderItemsTotal" open>
+                <summary>
+                    <span>Total Harga</span>
+                    <strong id="orderItemsTotalValue">Rp 0</strong>
+                </summary>
+            </details>
             <div class="order-items-actions">
                 <button class="mini-btn" type="button" id="addOrderItemBtn">+ Tambah Barang</button>
             </div>

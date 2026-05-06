@@ -70,9 +70,9 @@
     <div class="table-footer-row">
         <p class="table-meta" id="{{ $tableId }}DataInfo">Menampilkan 0 data</p>
         <div class="pagination-controls">
-            <button class="mini-btn" type="button" data-page-nav="prev" data-page-table="{{ $tableId }}">Prev</button>
+            <button class="mini-btn" type="button" data-page-nav="prev" data-page-table="{{ $tableId }}">&lt;</button>
             <span class="page-indicator" id="{{ $tableId }}PageInfo">1 / 1</span>
-            <button class="mini-btn" type="button" data-page-nav="next" data-page-table="{{ $tableId }}">Next</button>
+            <button class="mini-btn" type="button" data-page-nav="next" data-page-table="{{ $tableId }}">&gt;</button>
         </div>
     </div>
 

@@ -36,6 +36,10 @@
     line-height: 1.45;
 }
 
+.bsa-body.is-account-gate-open {
+    overflow: hidden;
+}
+
 .bsa-app {
     min-height: 100vh;
     display: flex;
@@ -308,6 +312,7 @@
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: 14px;
+    min-width: 0;
 }
 
 .panel-title {
@@ -454,6 +459,7 @@
     border-radius: 12px;
     padding: 14px;
     min-height: 220px;
+    min-width: 0;
 }
 
 .metric-header {
@@ -470,12 +476,25 @@
 }
 
 .metric-dropdown {
-    border: 0;
-    background: transparent;
+    border: 1px solid transparent;
+    background: #f4f6fa;
     color: #454f62;
     font-weight: 700;
     font-size: 0.76rem;
     cursor: pointer;
+    border-radius: 10px;
+    min-height: 30px;
+    padding: 0 28px 0 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image:
+        linear-gradient(45deg, transparent 50%, #71809a 50%),
+        linear-gradient(135deg, #71809a 50%, transparent 50%);
+    background-position:
+        calc(100% - 15px) 52%,
+        calc(100% - 10px) 52%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
 }
 
 .metric-value {
@@ -570,6 +589,7 @@
 
 .data-panel {
     padding: 14px;
+    min-width: 0;
 }
 
 .toolbar-row {
@@ -1076,6 +1096,11 @@
     min-width: 76px;
 }
 
+.finance-toolbar-actions .ghost-btn.icon-btn {
+    min-width: 38px;
+    width: 38px;
+}
+
 .finance-toolbar-actions .filter-select {
     min-width: 104px;
 }
@@ -1269,12 +1294,17 @@
 }
 
 .finance-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-height: 32px;
     border-radius: 10px;
     padding: 0 12px;
     color: #2f3c55;
     font-size: 0.76rem;
     font-weight: 700;
+    white-space: nowrap;
+    flex: 0 0 auto;
 }
 
 .finance-bars-wrap {
@@ -1532,7 +1562,7 @@
     display: none;
     align-items: center;
     justify-content: center;
-    background: rgba(236, 239, 245, 0.92);
+    background: #ffffff;
     z-index: 60;
     padding: 20px;
 }
@@ -1545,7 +1575,7 @@
     width: min(100%, 560px);
     border-radius: 14px;
     border: 1px solid var(--line);
-    background: #f7f8fa;
+    background: #ffffff;
     padding: 18px;
 }
 
@@ -1784,13 +1814,24 @@
 }
 
 .order-items-total {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     border: 1px solid #cfd7e5;
     background: #f6f8fc;
     border-radius: 10px;
+    padding: 0;
+    list-style: none;
+}
+
+.order-items-total summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 10px 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.order-items-total summary:hover {
+    background: #f0f3f8;
 }
 
 .order-items-total span {
@@ -2202,12 +2243,16 @@
         left: 0;
     }
 
-    .bsa-app.sidebar-mobile-open::after {
-        content: '';
+    .bsa-app.sidebar-mobile-open .sidebar-backdrop {
+        display: block;
+    }
+
+    .sidebar-backdrop {
+        display: none;
         position: fixed;
         inset: 0;
         z-index: 20;
-        background: rgba(0, 0, 0, 0.24);
+        background: rgba(0, 0, 0, 0.4);
     }
 
     .bsa-topbar {
@@ -2231,11 +2276,38 @@
 
 @media (max-width: 760px) {
     .bsa-topbar {
-        height: 68px;
+        min-height: 68px;
+        height: auto;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .topbar-left {
+        min-width: 0;
+        flex: 1;
+    }
+    
+    .topbar-left > div {
+        min-width: 0;
+    }
+
+    .page-title {
+        font-size: 1.1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .page-date {
+        font-size: 0.65rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .topbar-right {
         gap: 8px;
+        flex-shrink: 0;
     }
 
     .profile-pill {
@@ -2260,6 +2332,17 @@
     .table-footer-row {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .mini-table-wrap, 
+    .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .mini-table, 
+    .bsa-table {
+        min-width: 650px;
     }
 
     .entity-form-grid {

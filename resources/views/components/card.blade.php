@@ -12,7 +12,11 @@
     <div class="metric-header">
         <h3>{{ $title }}</h3>
         @if ($showDropdown)
-            <button class="metric-dropdown" type="button">Bulan ini <span>v</span></button>
+            <select class="metric-dropdown" data-metric-period-select="{{ $counterId }}" aria-label="Pilih periode {{ $title }}">
+                <option value="day">Hari ini</option>
+                <option value="week">Minggu ini</option>
+                <option value="month" selected>Bulan ini</option>
+            </select>
         @endif
     </div>
 

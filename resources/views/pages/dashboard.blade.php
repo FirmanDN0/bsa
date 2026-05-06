@@ -9,6 +9,7 @@
 
     <div class="bsa-app" id="bsaApp">
         @include('components.sidebar')
+        <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
 
         <div class="bsa-main">
             @include('components.navbar')
@@ -255,9 +256,9 @@
                             <div class="table-footer-row">
                                 <p class="table-meta" id="financeDataInfo">Menampilkan 0 data</p>
                                 <div class="pagination-controls">
-                                    <button class="mini-btn" type="button" data-page-nav="prev" data-page-table="finance">Prev</button>
+                                    <button class="mini-btn" type="button" data-page-nav="prev" data-page-table="finance">&lt;</button>
                                     <span class="page-indicator" id="financePageInfo">1 / 1</span>
-                                    <button class="mini-btn" type="button" data-page-nav="next" data-page-table="finance">Next</button>
+                                    <button class="mini-btn" type="button" data-page-nav="next" data-page-table="finance">&gt;</button>
                                 </div>
                             </div>
 
@@ -318,7 +319,7 @@
 
                             <article class="panel finance-distribution-panel">
                                 <div class="finance-panel-head">
-                                    <h3>Data Pengeluaran</h3>
+                                    <h3>Data Pemasukan &amp; Pengeluaran</h3>
                                     <button class="ghost-btn finance-chip" type="button" id="financeDistributionRange">Minggu ini</button>
                                 </div>
 
@@ -343,9 +344,9 @@
                                 <h2 class="panel-title">Kalender Kegiatan</h2>
 
                                 <div class="calendar-page-controls">
-                                    <button class="mini-btn" type="button" data-cal-nav="prev">Prev</button>
+                                    <button class="mini-btn" type="button" data-cal-nav="prev">&lt;</button>
                                     <p id="calendarMonthLabel">April 2026</p>
-                                    <button class="mini-btn" type="button" data-cal-nav="next">Next</button>
+                                    <button class="mini-btn" type="button" data-cal-nav="next">&gt;</button>
                                     <button class="ghost-btn" type="button" data-cal-nav="today">Hari Ini</button>
                                 </div>
                             </div>
