@@ -1,7 +1,7 @@
 <aside class="bsa-sidebar" id="bsaSidebar">
     <div class="sidebar-brand" aria-label="BSA - System">
-        <img class="sidebar-brand-logo" src="{{ asset('images/logo-bsa-full.png') }}" alt="BSA - System">
-        <img class="sidebar-brand-mark" src="{{ asset('images/logo-bsa-mark.png') }}" alt="BSA">
+        <img class="sidebar-brand-logo" src="{{ asset('images/logo-bsa-full.webp') }}" alt="BSA - System">
+        <img class="sidebar-brand-mark" src="{{ asset('images/logo-bsa-mark.webp') }}" alt="BSA">
     </div>
 
     <nav class="sidebar-nav" aria-label="Main Navigation">
