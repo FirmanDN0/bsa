@@ -669,12 +669,21 @@
 }
 
 .ghost-btn.active-filter {
-    box-shadow: inset 0 0 0 1px #a5b4cf;
+    background: var(--blue-soft) !important;
+    border-color: var(--blue) !important;
+    color: var(--blue) !important;
 }
 
 .ghost-btn:hover,
 .mini-btn:hover {
-    background: #ebf0f8;
+    background: #f3f4f6 !important;
+    border-color: #cbd5e1 !important;
+    color: var(--blue) !important;
+}
+
+.ghost-btn:active,
+.mini-btn:active {
+    background: #e5e7eb !important;
 }
 
 .icon-btn {
@@ -795,7 +804,8 @@
 }
 
 .filter-select:hover {
-    background: #ebf0f8;
+    border-color: #cbd5e1 !important;
+    background-color: #f3f4f6 !important;
 }
 
 .filter-select:focus {
