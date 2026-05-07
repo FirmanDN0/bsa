@@ -44,11 +44,8 @@
     </nav>
 
     <div class="sidebar-footer" id="ownerOnlySidebarSection">
-        <div class="sidebar-role" title="Status Akun">
-            <span class="sidebar-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3a4 4 0 0 1 4 4v1h3a2 2 0 0 1 2 2v3H3v-3a2 2 0 0 1 2-2h3V7a4 4 0 0 1 4-4m-2 5h4V7a2 2 0 1 0-4 0zM3 15h18v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-            </span>
-            <span class="sidebar-label" id="sidebarRoleLabel">Karyawan</span>
+        <div style="margin: 14px 0 6px; padding: 0 10px; pointer-events: none; user-select: none;">
+            <span id="sidebarRoleLabel" style="font-size: 0.92rem; font-weight: 800; color: #111827; display: block; letter-spacing: 0.01em;">Karyawan</span>
         </div>
 
         <button class="sidebar-link sidebar-muted" type="button" data-view-target="activity" data-owner-only="true">
