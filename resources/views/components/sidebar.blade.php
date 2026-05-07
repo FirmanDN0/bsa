@@ -44,7 +44,7 @@
     </nav>
 
     <div class="sidebar-footer" id="ownerOnlySidebarSection">
-        <div class="sidebar-role">
+        <div class="sidebar-role" title="Status Akun">
             <span class="sidebar-icon">
                 <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3a4 4 0 0 1 4 4v1h3a2 2 0 0 1 2 2v3H3v-3a2 2 0 0 1 2-2h3V7a4 4 0 0 1 4-4m-2 5h4V7a2 2 0 1 0-4 0zM3 15h18v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
             </span>

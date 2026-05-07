@@ -94,8 +94,7 @@
     border-bottom: 1px solid var(--line);
 }
 
-.sidebar-link,
-.sidebar-role {
+.sidebar-link {
     width: 100%;
     border: 0;
     background: transparent;
@@ -113,10 +112,29 @@
     transition: background 0.18s ease, color 0.18s ease;
 }
 
-.sidebar-link:hover,
-.sidebar-role:hover {
+.sidebar-role {
+    width: 100%;
+    border-radius: 10px;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    color: #111827;
+    cursor: default;
+    font-size: 0.84rem;
+    font-weight: 700;
+    text-align: left;
+    transition: background 0.18s ease;
+}
+
+.sidebar-link:hover {
     background: #ebeff5;
     color: #4a5568;
+}
+
+.sidebar-role:hover {
+    background: #f1f4f9;
 }
 
 .sidebar-link.is-active {
@@ -153,7 +171,6 @@
 
 .sidebar-role {
     margin-bottom: 2px;
-    color: #111827;
 }
 
 .sidebar-muted {
