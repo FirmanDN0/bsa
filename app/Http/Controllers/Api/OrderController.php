@@ -209,6 +209,7 @@ class OrderController extends Controller
                     'product_name' => $name,
                     'quantity' => $quantity,
                     'unit_price' => $unitPrice,
+                    'buy_price' => (float) ($product?->price_buy ?? 0),
                     'line_total' => $lineTotal,
                 ];
             }
@@ -230,6 +231,7 @@ class OrderController extends Controller
                 'product_name' => $fallbackName,
                 'quantity' => 1,
                 'unit_price' => $fallbackPrice,
+                'buy_price' => (float) ($product?->price_buy ?? 0),
                 'line_total' => $fallbackPrice,
             ];
         }
@@ -384,12 +386,15 @@ class OrderController extends Controller
             return;
         }
 
+        $cost = $order->items->sum(fn ($item) => (float) $item->buy_price * (int) $item->quantity);
+
         $payload = [
             'order_id' => $order->id,
             'transaction_date' => optional($order->order_date)->format('Y-m-d') ?? now()->toDateString(),
             'description' => $this->buildFinanceDescriptionForOrder($order),
             'category' => 'pemasukan',
             'amount' => (float) $order->nominal,
+            'cost' => (float) $cost,
         ];
 
         if ($existing) {

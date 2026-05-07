@@ -16,6 +16,7 @@ class FinanceTransaction extends Model
         'description',
         'category',
         'amount',
+        'cost',
     ];
 
     protected function casts(): array
@@ -23,6 +24,7 @@ class FinanceTransaction extends Model
         return [
             'transaction_date' => 'date',
             'amount' => 'decimal:2',
+            'cost' => 'decimal:2',
         ];
     }
 

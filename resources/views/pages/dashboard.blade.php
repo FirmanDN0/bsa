@@ -27,7 +27,8 @@
                                             <th>No. Barang</th>
                                             <th>Kode Barang</th>
                                             <th>Nama Barang</th>
-                                            <th>Harga</th>
+                                            <th>H. Beli</th>
+                                            <th>H. Jual</th>
                                             <th>Stok</th>
                                         </tr>
                                     </thead>
@@ -123,7 +124,8 @@
                             ['key' => 'id', 'label' => 'No. Barang'],
                             ['key' => 'code', 'label' => 'Kode Barang'],
                             ['key' => 'name', 'label' => 'Nama Barang'],
-                            ['key' => 'price', 'label' => 'Harga'],
+                            ['key' => 'priceBuy', 'label' => 'Modal'],
+                            ['key' => 'priceSell', 'label' => 'Jual'],
                             ['key' => 'stock', 'label' => 'Stok(pcs)'],
                             ['key' => 'action', 'label' => 'Action', 'sortable' => false, 'class' => 'action-col'],
                         ],

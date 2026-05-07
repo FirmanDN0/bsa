@@ -13,6 +13,8 @@ class Product extends Model
     protected $fillable = [
         'code',
         'name',
+        'price_buy',
+        'price_sell',
         'price',
         'stock',
     ];
@@ -20,6 +22,8 @@ class Product extends Model
     protected function casts(): array
     {
         return [
+            'price_buy' => 'decimal:2',
+            'price_sell' => 'decimal:2',
             'price' => 'decimal:2',
         ];
     }

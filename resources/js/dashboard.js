@@ -47,12 +47,20 @@ const tableDefinitions = {
             },
             { key: 'name', label: 'Nama Barang', type: 'text', required: true },
             {
-                key: 'price',
-                label: 'Harga',
+                key: 'priceBuy',
+                label: 'Harga Beli',
                 type: 'number',
                 required: true,
                 numericFormat: 'id-thousands',
-                placeholder: 'Contoh: 10.000',
+                placeholder: 'Harga modal barang',
+            },
+            {
+                key: 'priceSell',
+                label: 'Harga Jual',
+                type: 'number',
+                required: true,
+                numericFormat: 'id-thousands',
+                placeholder: 'Harga jual ke pelanggan',
             },
             { key: 'stock', label: 'Stok(pcs)', type: 'number', required: true },
         ],
@@ -71,7 +79,7 @@ const tableDefinitions = {
             return true;
         },
         formatCell: (key, value) => {
-            if (key === 'price') {
+            if (key === 'priceBuy' || key === 'priceSell' || key === 'price') {
                 return formatCurrency(value);
             }
             return value;
@@ -1583,7 +1591,8 @@ function renderTableRow(table, row, rowNumber = 0) {
                 <td>${displayNo}</td>
                 <td>${escapeHtml(row.code)}</td>
                 <td>${escapeHtml(row.name)}</td>
-                <td>${formatCurrency(row.price)}</td>
+                <td>${formatCurrency(row.priceBuy)}</td>
+                <td>${formatCurrency(row.priceSell)}</td>
                 <td>${row.stock}</td>
                 <td>
                     <div class="row-actions">
@@ -1748,7 +1757,8 @@ function renderDashboardMiniTables() {
                 <td>${row.id}</td>
                 <td>${escapeHtml(row.code)}</td>
                 <td>${escapeHtml(row.name)}</td>
-                <td>${formatCurrency(row.price)}</td>
+                <td>${formatCurrency(row.priceBuy)}</td>
+                <td>${formatCurrency(row.priceSell)}</td>
                 <td>${row.stock}</td>
             </tr>
         `).join('');
@@ -2253,13 +2263,14 @@ function renderFinanceOverview() {
     const monthLabel = capitalize(new Intl.DateTimeFormat('id-ID', { month: 'long' }).format(now));
 
     const rows = getFinanceRowsByPeriod(state.financePeriod);
-    const incoming = rows
-        .filter((row) => !isFinanceOutgoingCategory(row.category))
-        .reduce((total, row) => total + Number(row.amount), 0);
-    const outgoing = rows
-        .filter((row) => isFinanceOutgoingCategory(row.category))
-        .reduce((total, row) => total + Number(row.amount), 0);
-    const net = incoming - outgoing;
+    const incomingRows = rows.filter((row) => !isFinanceOutgoingCategory(row.category));
+    const outgoingRows = rows.filter((row) => isFinanceOutgoingCategory(row.category));
+
+    const incoming = incomingRows.reduce((total, row) => total + Number(row.amount), 0);
+    const incomingCost = incomingRows.reduce((total, row) => total + Number(row.cost || 0), 0);
+    const outgoing = outgoingRows.reduce((total, row) => total + Number(row.amount), 0);
+    
+    const net = (incoming - incomingCost) - outgoing;
 
     const summaryMap = {
         day: 'Periode hari ini.',
@@ -3203,7 +3214,7 @@ function getOrderProductCatalog() {
     return (state.data.stock || [])
         .map((item) => ({
             name: String(item.name || '').trim(),
-            price: Number(item.price || 0),
+            price: Number(item.priceSell || item.price || 0),
         }))
         .filter((item) => item.name)
         .sort((a, b) => a.name.localeCompare(b.name, 'id'));
@@ -3305,7 +3316,7 @@ function resolveProductPrice(name, products = getOrderProductCatalog()) {
     }
 
     const matched = products.find((item) => normalizeComparableText(item.name) === target);
-    return matched ? Number(matched.price || 0) : null;
+    return matched ? Number(matched.priceSell || matched.price || 0) : null;
 }
 
 function syncOrderItemTotals(productInput, nominalInput, rowsWrap, totalValueNode = null) {
@@ -3429,9 +3440,16 @@ function bindStockCodeAutoFill(table) {
             return false;
         }
 
+        const buyPriceInput = document.getElementById('field-priceBuy');
+        const sellPriceInput = document.getElementById('field-priceSell');
+
         codeInput.value = String(matched.code ?? '');
         nameInput.value = String(matched.name ?? '');
-        priceInput.value = formatCurrency(Number(matched.price || 0));
+        
+        if (buyPriceInput) buyPriceInput.value = formatCurrency(Number(matched.priceBuy || 0));
+        if (sellPriceInput) sellPriceInput.value = formatCurrency(Number(matched.priceSell || 0));
+        if (priceInput) priceInput.value = formatCurrency(Number(matched.priceSell || 0));
+        
         stockInput.value = String(Number(matched.stock || 0));
 
         state.modalState.mode = 'edit';

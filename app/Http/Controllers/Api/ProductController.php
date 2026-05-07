@@ -29,9 +29,16 @@ class ProductController extends Controller
         $payload = $request->validate([
             'code' => ['nullable', 'string', 'max:50', 'unique:products,code'],
             'name' => ['required', 'string', 'max:255'],
-            'price' => ['required', 'numeric', 'min:0'],
+            'price_buy' => ['required', 'numeric', 'min:0'],
+            'price_sell' => ['required', 'numeric', 'min:0'],
+            'price' => ['nullable', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
         ]);
+
+        if (!isset($payload['price_sell']) && isset($payload['price'])) {
+            $payload['price_sell'] = $payload['price'];
+        }
+        $payload['price'] = $payload['price_sell']; // Sync old field for safety
 
         if (trim((string) ($payload['code'] ?? '')) === '') {
             $payload['code'] = $this->generateUniqueProductCode((string) ($payload['name'] ?? ''));
@@ -57,9 +64,16 @@ class ProductController extends Controller
         $payload = $request->validate([
             'code' => ['required', 'string', 'max:50', Rule::unique('products', 'code')->ignore($product->id)],
             'name' => ['required', 'string', 'max:255'],
-            'price' => ['required', 'numeric', 'min:0'],
+            'price_buy' => ['required', 'numeric', 'min:0'],
+            'price_sell' => ['required', 'numeric', 'min:0'],
+            'price' => ['nullable', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
         ]);
+
+        if (!isset($payload['price_sell']) && isset($payload['price'])) {
+            $payload['price_sell'] = $payload['price'];
+        }
+        $payload['price'] = $payload['price_sell']; // Sync old field for safety
 
         $product->update($payload);
 

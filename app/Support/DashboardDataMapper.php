@@ -20,7 +20,9 @@ class DashboardDataMapper
             'id' => $product->id,
             'code' => $product->code,
             'name' => $product->name,
-            'price' => (float) $product->price,
+            'priceBuy' => (float) $product->price_buy,
+            'priceSell' => (float) $product->price_sell,
+            'price' => (float) $product->price_sell, // For backward compatibility
             'stock' => (int) $product->stock,
         ];
     }
@@ -47,6 +49,7 @@ class DashboardDataMapper
                 'product' => $item->product_name,
                 'quantity' => (int) $item->quantity,
                 'unitPrice' => (float) $item->unit_price,
+                'buyPrice' => (float) $item->buy_price,
                 'lineTotal' => (float) $item->line_total,
             ])->values()->all(),
         ];
@@ -122,10 +125,12 @@ class DashboardDataMapper
     {
         return [
             'id' => $transaction->id,
+            'orderId' => $transaction->order_id,
             'date' => optional($transaction->transaction_date)->format('d.m.y') ?? '',
             'description' => $transaction->description,
             'category' => $transaction->category,
             'amount' => (float) $transaction->amount,
+            'cost' => (float) $transaction->cost,
         ];
     }
 
