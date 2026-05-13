@@ -2,46 +2,68 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Hash;
 
 class AccountOnlySeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        $this->truncateBusinessTables();
+        // 1. Pastikan Role tersedia
+        $ownerRole = Role::updateOrCreate(
+            ['name' => 'Owner'],
+            ['description' => 'Pemilik Usaha / Administrator Utama']
+        );
 
-        $this->call([
-            RoleSeeder::class,
-            UserSeeder::class,
-        ]);
-    }
+        $karyawanRole = Role::updateOrCreate(
+            ['name' => 'Karyawan'],
+            ['description' => 'Staff Operasional Toko']
+        );
 
-    private function truncateBusinessTables(): void
-    {
-        $tables = [
-            'order_items',
-            'finance_transactions',
-            'orders',
-            'reports',
-            'activity_logs',
-            'growth_reports',
-            'calendar_events',
-            'customers',
-            'products',
-        ];
+        // 2. Buat Akun Owner (1 Akun)
+        User::updateOrCreate(
+            ['phone' => '081234567890'],
+            [
+                'name' => 'Dapmon',
+                'role_id' => $ownerRole->id,
+                'password' => Hash::make('password'),
+                'position' => 'Owner',
+                'division' => 'Management',
+                'shift' => 'Pagi',
+                'employment_status' => 'aktif',
+            ]
+        );
 
-        Schema::disableForeignKeyConstraints();
+        // 3. Buat Akun Karyawan (2 Akun)
+        User::updateOrCreate(
+            ['phone' => '081234567891'],
+            [
+                'name' => 'Ahmad Permata',
+                'role_id' => $karyawanRole->id,
+                'password' => Hash::make('password'),
+                'position' => 'Kasir',
+                'division' => 'Penjualan',
+                'shift' => 'Pagi',
+                'employment_status' => 'aktif',
+            ]
+        );
 
-        try {
-            foreach ($tables as $table) {
-                if (Schema::hasTable($table)) {
-                    DB::table($table)->truncate();
-                }
-            }
-        } finally {
-            Schema::enableForeignKeyConstraints();
-        }
+        User::updateOrCreate(
+            ['phone' => '081234567892'],
+            [
+                'name' => 'Ayu Nugroho',
+                'role_id' => $karyawanRole->id,
+                'password' => Hash::make('password'),
+                'position' => 'Staff Gudang',
+                'division' => 'Logistik',
+                'shift' => 'Siang',
+                'employment_status' => 'aktif',
+            ]
+        );
     }
 }

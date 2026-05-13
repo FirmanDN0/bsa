@@ -24,6 +24,8 @@ class ProductController extends Controller
         $request->merge([
             'code' => $this->normalizeCodeInput((string) $request->input('code', '')),
             'name' => trim((string) $request->input('name', '')),
+            'price_buy' => $request->input('price_buy') ?? $request->input('priceBuy'),
+            'price_sell' => $request->input('price_sell') ?? $request->input('priceSell'),
         ]);
 
         $payload = $request->validate([
@@ -59,6 +61,8 @@ class ProductController extends Controller
         $request->merge([
             'code' => $this->normalizeCodeInput((string) $request->input('code', '')),
             'name' => trim((string) $request->input('name', '')),
+            'price_buy' => $request->input('price_buy') ?? $request->input('priceBuy'),
+            'price_sell' => $request->input('price_sell') ?? $request->input('priceSell'),
         ]);
 
         $payload = $request->validate([

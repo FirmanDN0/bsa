@@ -67,8 +67,8 @@ class CalendarEventController extends Controller
     private function validatedPayload(Request $request): array
     {
         $validated = $request->validate([
-            'date' => ['required', 'date_format:Y-m-d'],
-            'time' => ['required', 'date_format:H:i'],
+            'date' => ['required', 'string', 'max:20'],
+            'time' => ['required', 'string', 'max:10'],
             'title' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'max:255'],
             'location' => ['required', 'string', 'max:255'],
@@ -78,13 +78,21 @@ class CalendarEventController extends Controller
         $parsedDate = DashboardDataMapper::parseDisplayDate($validated['date']);
         if (!$parsedDate) {
             throw ValidationException::withMessages([
-                'date' => 'Format tanggal tidak valid. Gunakan YYYY-MM-DD.',
+                'date' => 'Format tanggal tidak valid.',
+            ]);
+        }
+
+        try {
+            $eventTime = \Illuminate\Support\Carbon::parse($validated['time'])->format('H:i:s');
+        } catch (\Throwable) {
+            throw ValidationException::withMessages([
+                'time' => 'Format jam tidak valid.',
             ]);
         }
 
         return [
             'event_date' => $parsedDate->toDateString(),
-            'event_time' => $validated['time'].':00',
+            'event_time' => $eventTime,
             'title' => $validated['title'],
             'type' => $validated['type'],
             'location' => $validated['location'],

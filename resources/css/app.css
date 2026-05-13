@@ -306,6 +306,49 @@
     display: block;
 }
 
+.dash-actions-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.dash-action-btn {
+    border: 0;
+    border-radius: 10px;
+    background: var(--blue);
+    color: #ffffff;
+    font-size: 0.84rem;
+    font-weight: 700;
+    padding: 10px 22px;
+    cursor: pointer;
+    transition: transform 0.16s ease, filter 0.16s ease;
+    white-space: nowrap;
+}
+
+.dash-action-btn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+.dash-charts-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 260px;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.dash-tables-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.dash-finance-summary {
+    margin-bottom: 12px;
+}
+
 .dashboard-row {
     display: grid;
     gap: 12px;
@@ -316,6 +359,12 @@
     margin-bottom: 12px;
 }
 
+.metric-grid {
+    margin-top: 12px;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 .panel {
     background: var(--bg-card);
     border: 1px solid var(--line);
@@ -2251,6 +2300,14 @@
         grid-template-columns: 1fr;
     }
 
+    .dash-charts-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .dash-tables-row {
+        grid-template-columns: 1fr;
+    }
+
     .metric-grid {
         grid-template-columns: 1fr;
     }
@@ -2313,6 +2370,19 @@
 }
 
 @media (max-width: 760px) {
+    .dash-charts-row {
+        grid-template-columns: 1fr;
+    }
+
+    .dash-actions-row {
+        flex-direction: column;
+    }
+
+    .dash-action-btn {
+        width: 100%;
+        text-align: center;
+    }
+
     .bsa-topbar {
         min-height: 68px;
         height: auto;

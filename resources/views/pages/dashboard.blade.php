@@ -16,30 +16,33 @@
 
             <main class="bsa-content">
                 <section class="app-view is-active" data-view="dashboard">
-                    <div class="dashboard-row top-row">
-                        <article class="panel">
-                            <h2 class="panel-title">Data Stok Barang</h2>
+                    {{-- Row 1: Quick action buttons --}}
+                    <div class="dash-actions-row">
+                        <button class="dash-action-btn" type="button" data-open-entity-modal="stock" data-mode="add">+ Edit Stok Barang</button>
+                        <button class="dash-action-btn" type="button" data-open-entity-modal="orders" data-mode="add">+ Tambah Pesanan</button>
+                    </div>
 
-                            <div class="mini-table-wrap">
-                                <table class="mini-table">
-                                    <thead>
-                                        <tr>
-                                            <th>No. Barang</th>
-                                            <th>Kode Barang</th>
-                                            <th>Nama Barang</th>
-                                            <th>H. Beli</th>
-                                            <th>H. Jual</th>
-                                            <th>Stok</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="dashboardStockBody"></tbody>
-                                </table>
-                            </div>
+                    {{-- Row 2: Charts + Calendar (3 columns) --}}
+                    <div class="dash-charts-row">
+                        @include('components.card', [
+                            'title' => 'Penjualan',
+                            'value' => 0,
+                            'subtitle' => 'Memuat data penjualan...',
+                            'counterId' => 'salesTotal',
+                            'chartType' => 'line-soft',
+                            'format' => 'rupiah',
+                            'showDropdown' => true,
+                        ])
 
-                            <button class="primary-action" type="button" data-open-entity-modal="stock" data-mode="add">
-                                Edit Stok Barang
-                            </button>
-                        </article>
+                        @include('components.card', [
+                            'title' => 'Produk Terjual',
+                            'value' => 0,
+                            'subtitle' => 'Memuat data produk...',
+                            'counterId' => 'productSold',
+                            'chartType' => 'donut',
+                            'format' => 'id-integer',
+                            'showDropdown' => true,
+                        ])
 
                         <article class="panel calendar-panel">
                             <h3 id="dashboardMiniCalendarMonth">-</h3>
@@ -60,58 +63,76 @@
                         </article>
                     </div>
 
-                    <article class="panel">
-                        <h2 class="panel-title">Data Pesanan</h2>
+                    {{-- Row 3: Tables side by side --}}
+                    <div class="dash-tables-row">
+                        <article class="panel">
+                            <h2 class="panel-title">Data Stok Barang</h2>
+                            <div class="mini-table-wrap">
+                                <table class="mini-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No. Barang</th>
+                                            <th>Kode Barang</th>
+                                            <th>Nama Barang</th>
+                                            <th>Harga</th>
+                                            <th>Stok</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dashboardStockBody"></tbody>
+                                </table>
+                            </div>
+                        </article>
 
-                        <div class="mini-table-wrap">
-                            <table class="mini-table">
-                                <thead>
-                                    <tr>
-                                        <th>No. Pesanan</th>
-                                        <th>Tanggal</th>
-                                        <th>Pelanggan</th>
-                                        <th>Pesanan</th>
-                                        <th>Nominal Transaksi</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dashboardOrderBody"></tbody>
-                            </table>
-                        </div>
-
-                        <button class="primary-action" type="button" data-view-target-direct="orders">+ Tambah Pesanan</button>
-                    </article>
-
-                    <div class="metric-grid">
-                        @include('components.card', [
-                            'title' => 'Pertumbuhan Pelanggan',
-                            'value' => 0,
-                            'subtitle' => 'Memuat data pelanggan...',
-                            'counterId' => 'customerGrowth',
-                            'chartType' => 'line',
-                            'format' => 'signed-percent',
-                        ])
-
-                        @include('components.card', [
-                            'title' => 'Penjualan',
-                            'value' => 0,
-                            'subtitle' => 'Memuat data penjualan...',
-                            'counterId' => 'salesTotal',
-                            'chartType' => 'line-soft',
-                            'format' => 'rupiah',
-                            'showDropdown' => true,
-                        ])
-
-                        @include('components.card', [
-                            'title' => 'Produk Terjual',
-                            'value' => 0,
-                            'subtitle' => 'Memuat data produk...',
-                            'counterId' => 'productSold',
-                            'chartType' => 'donut',
-                            'format' => 'id-integer',
-                            'showDropdown' => true,
-                        ])
+                        <article class="panel">
+                            <h2 class="panel-title">Data Pesanan</h2>
+                            <div class="mini-table-wrap">
+                                <table class="mini-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No.Pesanan</th>
+                                            <th>Tanggal</th>
+                                            <th>Pencatan</th>
+                                            <th>Pesanan</th>
+                                            <th>Nominal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dashboardOrderBody"></tbody>
+                                </table>
+                            </div>
+                        </article>
                     </div>
+
+                    {{-- Row 4: Ringkasan Keuangan --}}
+                    <article class="panel dash-finance-summary">
+                        <div class="finance-panel-head finance-summary-head">
+                            <div>
+                                <h2 class="panel-title">Ringkasan Keuangan</h2>
+                                <p class="finance-caption" id="dashFinanceSummaryCaption">Periode bulan ini.</p>
+                            </div>
+                            <div class="finance-period-group" role="group" aria-label="Pilih Periode">
+                                <button class="ghost-btn" type="button" data-dash-finance-period="day">Harian</button>
+                                <button class="ghost-btn" type="button" data-dash-finance-period="week">Mingguan</button>
+                                <button class="ghost-btn is-selected" type="button" data-dash-finance-period="month">Bulanan</button>
+                            </div>
+                        </div>
+                        <div class="finance-kpi-grid finance-kpi-grid-three">
+                            <article class="finance-kpi-card incoming">
+                                <p>Total Pemasukan</p>
+                                <h3 id="dashIncomeValue">Rp 0</h3>
+                                <span class="finance-trend up" id="dashIncomeTrend">-</span>
+                            </article>
+                            <article class="finance-kpi-card outgoing">
+                                <p>Total Pengeluaran</p>
+                                <h3 id="dashExpenseValue">Rp 0</h3>
+                                <span class="finance-trend down" id="dashExpenseTrend">-</span>
+                            </article>
+                            <article class="finance-kpi-card net">
+                                <p>Laba Bersih</p>
+                                <h3 id="dashNetValue">Rp 0</h3>
+                                <span class="finance-trend up" id="dashNetTrend">-</span>
+                            </article>
+                        </div>
+                    </article>
                 </section>
 
                 <section class="app-view" data-view="stock">

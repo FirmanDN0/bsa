@@ -82,8 +82,8 @@ class ImportController extends Controller
             $payload = [
                 'code' => $this->requiredString($row, ['code', 'kode_barang', 'kode'], $line, 'Kode Barang'),
                 'name' => $this->requiredString($row, ['name', 'nama_barang', 'nama'], $line, 'Nama Barang'),
-                'price_buy' => $this->requiredFloat($row, ['price_buy', 'harga_beli', 'modal'], $line, 'Harga Beli', 0),
-                'price_sell' => $this->requiredFloat($row, ['price_sell', 'harga_jual', 'harga', 'price'], $line, 'Harga Jual', 0),
+                'price_buy' => $this->requiredFloat($row, ['price_buy', 'priceBuy', 'harga_beli', 'modal'], $line, 'Harga Beli', 0),
+                'price_sell' => $this->requiredFloat($row, ['price_sell', 'priceSell', 'harga_jual', 'harga', 'price'], $line, 'Harga Jual', 0),
                 'stock' => $this->requiredInt($row, ['stock', 'stok'], $line, 'Stok', 0),
             ];
             $payload['price'] = $payload['price_sell'];

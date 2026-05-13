@@ -558,19 +558,29 @@ function syncDashboardMetricPeriodControls() {
 }
 
 function bindFinanceControls() {
-    document.querySelectorAll('[data-finance-period]').forEach((button) => {
-        button.addEventListener('click', () => {
-            const period = button.dataset.financePeriod;
-            if (!period) {
-                return;
-            }
+    const handlePeriodChange = (button, attribute) => {
+        const period = button.getAttribute(attribute);
+        if (!period) {
+            return;
+        }
 
-            state.financePeriod = period;
-            document.querySelectorAll('[data-finance-period]').forEach((item) => {
-                item.classList.toggle('is-selected', item.dataset.financePeriod === period);
-            });
-            renderFinanceOverview();
+        state.financePeriod = period;
+        
+        // Sync both sets of buttons
+        document.querySelectorAll('[data-finance-period], [data-dash-finance-period]').forEach((item) => {
+            const itemPeriod = item.getAttribute('data-finance-period') || item.getAttribute('data-dash-finance-period');
+            item.classList.toggle('is-selected', itemPeriod === period);
         });
+        
+        renderFinanceOverview();
+    };
+
+    document.querySelectorAll('[data-finance-period]').forEach((button) => {
+        button.addEventListener('click', () => handlePeriodChange(button, 'data-finance-period'));
+    });
+
+    document.querySelectorAll('[data-dash-finance-period]').forEach((button) => {
+        button.addEventListener('click', () => handlePeriodChange(button, 'data-dash-finance-period'));
     });
 }
 
@@ -1453,6 +1463,7 @@ async function openView(viewName) {
     if (viewName === 'dashboard') {
         renderDashboardMiniCalendar();
         updateMetricCounters(!state.countersAnimated);
+        renderFinanceOverview();
     }
 
     if (viewName === 'finance') {
@@ -1460,6 +1471,10 @@ async function openView(viewName) {
     }
 
     if (viewName === 'calendar') {
+        if (!state.calendarView.loaded) {
+            await refreshCalendarEventsFromBackend();
+            state.calendarView.loaded = true;
+        }
         renderCalendarView();
     }
 }
@@ -1752,12 +1767,12 @@ function renderDashboardMiniTables() {
     const orderBody = document.getElementById('dashboardOrderBody');
 
     if (stockBody) {
-        stockBody.innerHTML = state.data.stock.slice(0, 4).map((row) => `
+        const rows = getProcessedRows('stock');
+        stockBody.innerHTML = rows.slice(0, 8).map((row, index) => `
             <tr>
-                <td>${row.id}</td>
+                <td>${index + 1}</td>
                 <td>${escapeHtml(row.code)}</td>
                 <td>${escapeHtml(row.name)}</td>
-                <td>${formatCurrency(row.priceBuy)}</td>
                 <td>${formatCurrency(row.priceSell)}</td>
                 <td>${row.stock}</td>
             </tr>
@@ -1765,14 +1780,14 @@ function renderDashboardMiniTables() {
     }
 
     if (orderBody) {
-        orderBody.innerHTML = state.data.orders.slice(0, 4).map((row) => `
+        const rows = getProcessedRows('orders');
+        orderBody.innerHTML = rows.slice(0, 4).map((row, index) => `
             <tr>
-                <td>${row.id}</td>
+                <td>${index + 1}</td>
                 <td>${escapeHtml(row.date)}</td>
                 <td>${escapeHtml(row.author)}</td>
                 <td>${escapeHtml(row.product)}</td>
                 <td>${formatCurrency(row.nominal)}</td>
-                <td>${tableDefinitions.orders.formatCell('status', row.status)}</td>
             </tr>
         `).join('');
     }
@@ -2255,10 +2270,6 @@ function renderMetricDonutChart(metricKey, donutData) {
 }
 
 function renderFinanceOverview() {
-    if (!document.getElementById('financeIncomeValue')) {
-        return;
-    }
-
     const now = getWibTodayDate();
     const monthLabel = capitalize(new Intl.DateTimeFormat('id-ID', { month: 'long' }).format(now));
 
@@ -2278,56 +2289,19 @@ function renderFinanceOverview() {
         month: `Periode ${monthLabel} ${now.getFullYear()}.`,
     };
 
-    const summaryCaption = document.getElementById('financeSummaryCaption');
-    if (summaryCaption) {
-        summaryCaption.textContent = summaryMap[state.financePeriod] || summaryMap.month;
+    // Update Finance Page Summary
+    const financeCaption = document.getElementById('financeSummaryCaption');
+    if (financeCaption) {
+        financeCaption.textContent = summaryMap[state.financePeriod] || summaryMap.month;
     }
+    updateFinanceKPIUI('finance', incoming, outgoing, net);
 
-    const trendMap = {
-        day: {
-            in: '+2.1% hari ini',
-            out: '+0.8% hari ini',
-            net: '+3.7% hari ini',
-        },
-        week: {
-            in: '+6.3% minggu ini',
-            out: '+2.4% minggu ini',
-            net: '+9.1% minggu ini',
-        },
-        month: {
-            in: '+12.5% dari bulan lalu',
-            out: '+4.1% dari bulan lalu',
-            net: '+18.9% dari bulan lalu',
-        },
-    };
-
-    const trend = trendMap[state.financePeriod] || trendMap.month;
-
-    const incomeValue = document.getElementById('financeIncomeValue');
-    const expenseValue = document.getElementById('financeExpenseValue');
-    const netValue = document.getElementById('financeNetValue');
-    const incomeTrend = document.getElementById('financeIncomeTrend');
-    const expenseTrend = document.getElementById('financeExpenseTrend');
-    const netTrend = document.getElementById('financeNetTrend');
-
-    if (incomeValue) {
-        incomeValue.textContent = `Rp ${formatCurrency(incoming)}`;
+    // Update Dashboard Summary
+    const dashCaption = document.getElementById('dashFinanceSummaryCaption');
+    if (dashCaption) {
+        dashCaption.textContent = summaryMap[state.financePeriod] || summaryMap.month;
     }
-    if (expenseValue) {
-        expenseValue.textContent = `Rp ${formatCurrency(outgoing)}`;
-    }
-    if (netValue) {
-        netValue.textContent = `Rp ${formatCurrency(Math.max(net, 0))}`;
-    }
-    if (incomeTrend) {
-        incomeTrend.textContent = trend.in;
-    }
-    if (expenseTrend) {
-        expenseTrend.textContent = trend.out;
-    }
-    if (netTrend) {
-        netTrend.textContent = trend.net;
-    }
+    updateFinanceKPIUI('dash', incoming, outgoing, net);
 
     const barsMeta = {
         day: { title: 'Arus Kas Harian', range: '7 Hari' },
@@ -2357,6 +2331,39 @@ function renderFinanceOverview() {
 
     renderFinanceBars(state.financePeriod);
     renderFinanceDistribution(rows);
+}
+
+function updateFinanceKPIUI(prefix, incoming, outgoing, net) {
+    const incomeValue = document.getElementById(`${prefix}IncomeValue`);
+    const expenseValue = document.getElementById(`${prefix}ExpenseValue`);
+    const netValue = document.getElementById(`${prefix}NetValue`);
+    const incomeTrend = document.getElementById(`${prefix}IncomeTrend`);
+    const expenseTrend = document.getElementById(`${prefix}ExpenseTrend`);
+    const netTrend = document.getElementById(`${prefix}NetTrend`);
+
+    if (incomeValue) {
+        incomeValue.textContent = `Rp ${formatCurrency(incoming)}`;
+    }
+    if (expenseValue) {
+        expenseValue.textContent = `Rp ${formatCurrency(outgoing)}`;
+    }
+    if (netValue) {
+        netValue.textContent = `Rp ${formatCurrency(net)}`;
+    }
+    
+    // Trend data is currently placeholder/empty in this version
+    if (incomeTrend) {
+        incomeTrend.textContent = '-';
+        incomeTrend.style.opacity = '0.5';
+    }
+    if (expenseTrend) {
+        expenseTrend.textContent = '-';
+        expenseTrend.style.opacity = '0.5';
+    }
+    if (netTrend) {
+        netTrend.textContent = '-';
+        netTrend.style.opacity = '0.5';
+    }
 }
 
 function renderCalendarView() {
@@ -3396,11 +3403,17 @@ function bindStockCodeAutoFill(table) {
     let lastAutoCode = '';
     let isManualCodeOverride = false;
     const applyGeneratedCode = () => {
-        lastAutoCode = generateNextStockCode(nameInput.value);
+        const name = nameInput.value.trim();
+        if (!name) {
+            lastAutoCode = '';
+            codeInput.value = '';
+            return;
+        }
+        lastAutoCode = generateNextStockCode(name);
         codeInput.value = lastAutoCode;
     };
 
-    if (isAddMode && !String(codeInput.value || '').trim()) {
+    if (isAddMode && !String(codeInput.value || '').trim() && String(nameInput.value || '').trim()) {
         applyGeneratedCode();
     }
 
@@ -4037,7 +4050,9 @@ async function submitEntityForm() {
         renderDashboardMiniTables();
         updateMetricCounters(false);
         if (table === 'calendarEvents') {
+            await refreshCalendarEventsFromBackend();
             renderCalendarView();
+            renderDashboardMiniCalendar();
         }
         if (table === 'finance') {
             renderFinanceOverview();
@@ -4360,6 +4375,33 @@ async function refreshCustomersFromBackend() {
         refreshTableView('customers');
     } catch (error) {
         // Keep current customer data if refresh fails.
+    }
+}
+
+async function refreshCalendarEventsFromBackend() {
+    const endpoint = apiEndpoints.calendarEvents;
+    if (!endpoint) {
+        return;
+    }
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                ...buildActorRequestHeaders(),
+            },
+        });
+
+        const result = await parseJsonResponse(response);
+        if (!response.ok || !Array.isArray(result.data)) {
+            return;
+        }
+
+        state.data.calendarEvents = result.data;
+    } catch (error) {
+        // Keep current data if refresh fails.
     }
 }
 
@@ -5583,7 +5625,7 @@ function resolveEntityFieldValue(table, field, editingRow) {
     }
 
     if (table === 'stock' && field.key === 'code' && !editingRow) {
-        return generateNextStockCode();
+        return '';
     }
 
     const rawValue = editingRow ? editingRow[field.key] : '';

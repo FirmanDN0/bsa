@@ -20,14 +20,18 @@ class DashboardController extends Controller
         // We only provide a small subset of data for the initial dashboard view.
         // Other data will be fetched via API when the user navigates to those sections.
         $bootstrapData = [
-            'stock' => Product::query()->orderBy('id')->limit(10)->get()->map(fn (Product $row) => DashboardDataMapper::stock($row))->values(),
+            'stock' => Product::query()->orderBy('name')->get()->map(fn (Product $row) => DashboardDataMapper::stock($row))->values(),
             'orders' => Order::query()->orderByDesc('id')->limit(10)->get()->map(fn (Order $row) => DashboardDataMapper::order($row))->values(),
             'users' => User::query()->with('role')->get()->map(fn (User $row) => DashboardDataMapper::employee($row))->values(),
-            // Empty placeholders for other large tables to keep initial load light
-            'customers' => [],
+            'customers' => Customer::query()->orderBy('name')->get()->map(fn (Customer $row) => DashboardDataMapper::customer($row))->values(),
             'activity' => [],
             'calendarEvents' => [],
-            'finance' => [],
+            'finance' => FinanceTransaction::query()
+                ->where('transaction_date', '>=', now()->subDays(45))
+                ->orderByDesc('id')
+                ->get()
+                ->map(fn (FinanceTransaction $row) => DashboardDataMapper::finance($row))
+                ->values(),
         ];
 
         $summaryData = [
